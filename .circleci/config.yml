@@ -350,8 +350,3 @@ workflows:
       #     requires: [cloudfront-update]
 
 
-aws cloudformation delete-stack \
---stack-name udapeoeple-backend-<<parameters.workflow_id>>
-aws s3 rm s3://udapeople-<<parameters.workflow_id>> --recursive
-aws cloudformation delete-stack \
---stack-name udapeoeple-frontend-<<parameters.workflow_id>>
