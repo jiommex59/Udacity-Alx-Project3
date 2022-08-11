@@ -27,20 +27,40 @@ commands:
             aws cloudformation delete-stack \
             --stack-name udapeoeple-frontend-<<parameters.workflow_id>>
 
+  # revert-migrations:
+  #   description: Revert the last migration if successfully run in the current workflow.
+  #   parameters:
+  #     workflow_id:
+  #       type: string
+  #   steps:
+  #     - run:
+  #         name: Revert migrations
+  #         when: on_fail
+  #         command: |
+  #           cd ~/project/backend
+  #           npm install
+  #           npm run build
+  #           npm run migrations:revert
+
   revert-migrations:
-    description: Revert the last migration if successfully run in the current workflow.
+    description: Revert migration on failure response in current workflow.
     parameters:
-      workflow_id:
+      workflow-id:
         type: string
+        default: "${CIRCLE_WORKFLOW_ID:0:7}"
     steps:
       - run:
-          name: Revert migrations
+          name: reverse migration
           when: on_fail
           command: |
-            cd ~/project/backend
-            npm install
-            npm run build
-            npm run migrations:revert
+            SUCCESS=$(curl --insecure https://kvdb.io/2aPVLoyxELud1pQfNyDRRE/migration_<< parameters.workflow-id >>)
+            if(( $SUCCESS==1 )); 
+            then
+              cd ~/project/backend
+              npm install
+              npm run migration:revert
+              exit 1
+            fi
             
 jobs:
   build-frontend:
@@ -328,7 +348,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            export URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION1}.amazonaws.com/#/employees"            
+            export URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees"            
             echo $URL
             if curl ${URL} | grep "Welcome"; then return 0; else return 1; fi
       - destroy-environment:
