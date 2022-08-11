@@ -45,15 +45,15 @@ commands:
   revert-migrations:
     description: Revert migration on failure response in current workflow.
     parameters:
-      workflow-id:
+      workflow_id:
         type: string
-        # default: "${CIRCLE_WORKFLOW_ID:0:7}"
+        default: "${CIRCLE_WORKFLOW_ID:0:7}"
     steps:
       - run:
-          name: reverse migration
+          name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure https://kvdb.io/2aPVLoyxELud1pQfNyDRRE/migration_<< parameters.workflow-id >>)
+            SUCCESS=$(curl --insecure https://kvdb.io/2aPVLoyxELud1pQfNyDRRE/migration_<< parameters.workflow_id >>)
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
