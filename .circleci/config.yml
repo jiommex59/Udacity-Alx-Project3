@@ -130,7 +130,7 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run:
-          name: Analyze backend
+          name: Analyze backend for security threats
           command: |
             cd backend
             npm install
@@ -227,7 +227,7 @@ jobs:
       - run:
           name: Send migration results to kvdb
           command: |
-            if grep -q "success" ~/project/backend/migrations.txt
+            if grep -q "successfully" ~/project/backend/migrations.txt
             then
               curl --insecure https://kvdb.io/2aPVLoyxELud1pQfNyDRRE/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
             fi
@@ -243,7 +243,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update --no-cache tar gzip nodejs npm aws-cli
+            apk add --update --no-cache tar gzip nodejs npm aws-cli curl
       - restore_cache:
           keys: [frontend-build]
       - run:
